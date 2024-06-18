@@ -34,7 +34,7 @@ public class HomeController {
 
     @RequestMapping("/")
     public String index(Model model) {
-        model.addAttribute("title", "MyJobs");
+//        model.addAttribute("title", "MyJobs");
         model.addAttribute("jobs", jobRepository.findAll());
 
         return "index";
@@ -42,10 +42,10 @@ public class HomeController {
 
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
-        model.addAttribute("title", "Add Job");
+        model.addAttribute(new Job());
+//        model.addAttribute("title", "Add Job");
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute("skills", skillRepository.findAll());
-        model.addAttribute(new Job());
         return "add";
     }
 
@@ -54,19 +54,18 @@ public class HomeController {
                                     Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Add Job");
-            model.addAttribute("employers", employerRepository.findAll());
-            model.addAttribute("skills", skillRepository.findAll());
+//            model.addAttribute("title", "Add Job");
+//            model.addAttribute("employers", employerRepository.findAll());
+//            model.addAttribute("skills", skillRepository.findAll());
             return "add";
         }
 
-        Optional<Employer> employerOptional = employerRepository.findById(employerId);
-        if (employerOptional.isPresent()) {
-            Employer employer = employerOptional.get();
-            newJob.setEmployer(employer);
-        }
+        Employer employer = employerRepository.findById(employerId).orElse(new Employer());
+        newJob.setEmployer(employer);
+
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         newJob.setSkills(skillObjs);
+
 
         jobRepository.save(newJob);
         return "redirect:";
@@ -74,8 +73,14 @@ public class HomeController {
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
+        Optional<Job> result = jobRepository.findById(jobId);
+        if(!result.isEmpty()) {
+            Job job = (Job) result.get();
+            model.addAttribute("job", job);
 
-            return "view";
+            return "view";} else {
+            return "redirect:/";
+        }
     }
 
 }

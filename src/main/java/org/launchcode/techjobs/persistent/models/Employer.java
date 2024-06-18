@@ -18,13 +18,13 @@ public class Employer extends AbstractEntity {
 
     @OneToMany
     @JoinColumn(name = "employer_id")
-    private List<Job> jobs = new ArrayList<>();
+    private final List<Job> jobs = new ArrayList<>();
+    public Employer(){}
 
     public Employer(String location) {
         this.location = location;
     }
 
-    public Employer(){}
 
     public @NotNull @Size(min = 3, max = 50, message = "Must be between 3 and 50 characters!") String getLocation() {
         return location;
